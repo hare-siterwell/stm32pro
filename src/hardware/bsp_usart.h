@@ -9,8 +9,9 @@
  * @copyright Copyright (c) 2022
  *
  */
-#ifndef BSP_USART_H
-#define BSP_USART_H
+
+#ifndef BSP_USART_H_
+#define BSP_USART_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,4 +35,4 @@ void usart_send(USART_TypeDef *usart, const uint8_t *data, uint32_t size);
 }
 #endif
 
-#endif  // BSP_USART_H
+#endif  // BSP_USART_H_

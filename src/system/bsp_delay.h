@@ -9,8 +9,9 @@
  * @copyright Copyright (c) 2022
  *
  */
-#ifndef BSP_DELAY_H
-#define BSP_DELAY_H
+
+#ifndef BSP_DELAY_H_
+#define BSP_DELAY_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,4 +27,4 @@ void delay_ms(uint32_t nms);
 }
 #endif
 
-#endif // BSP_DELAY_H
+#endif  // BSP_DELAY_H_

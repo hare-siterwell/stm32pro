@@ -8,8 +8,9 @@
  * @copyright Copyright (c) 2022
  *
  */
-#ifndef BSP_H
-#define BSP_H
+
+#ifndef BSP_H_
+#define BSP_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,4 +31,4 @@ void task1();
 }
 #endif
 
-#endif  // BSP_H
+#endif  // BSP_H_

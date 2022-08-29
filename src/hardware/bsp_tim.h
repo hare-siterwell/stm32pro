@@ -9,8 +9,9 @@
  * @copyright Copyright (c) 2022
  *
  */
-#ifndef BSP_TIM_H
-#define BSP_TIM_H
+
+#ifndef BSP_TIM_H_
+#define BSP_TIM_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,4 +27,4 @@ void tim_callback(TIM_TypeDef *tim);
 }
 #endif
 
-#endif  // BSP_TIM_H
+#endif  // BSP_TIM_H_
