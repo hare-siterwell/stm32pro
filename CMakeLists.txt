@@ -1,19 +1,21 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.18)
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR ARM)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
-set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 project(stm32pro C ASM)
 
-set(LINKER_SCRIPT "${PROJECT_SOURCE_DIR}/startup/STM32F103C8Tx_FLASH.ld")
+set(LINKER_SCRIPT "${PROJECT_SOURCE_DIR}/src/STM32F103C8Tx_FLASH.ld")
+set(MCPU "cortex-m3")
 
-file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
-  startup/*.s
-  drivers/STM32F1xx_HAL_Driver/Src/*.c
-  src/*.c
+file(GLOB PROJECT_SOURCES CONFIGURE_DEPENDS
+  src/startup_*.s
+  src/user/*.c
+  src/system/*.c
+  src/hardware/*.c
+  lib/STM32F1xx_HAL_Driver/Src/*.c
 )
 
 set(PROJECT_LIST ${PROJECT_NAME}.elf)
@@ -24,12 +26,12 @@ foreach(_project ${PROJECT_LIST})
   target_sources(${_project} PRIVATE ${PROJECT_SOURCES})
 
   target_include_directories(${_project} PRIVATE
-    drivers/CMSIS/Device/ST/STM32F1xx/Include
-    drivers/CMSIS/Include
-    drivers/STM32F1xx_HAL_Driver/Inc
-    src/hardware
-    src/system
     src/user
+    src/system
+    src/hardware
+    lib/CMSIS/Include
+    lib/CMSIS/Device/ST/STM32F1xx/Include
+    lib/STM32F1xx_HAL_Driver/Inc
   )
 
   target_compile_definitions(${_project} PRIVATE
@@ -39,30 +41,27 @@ foreach(_project ${PROJECT_LIST})
   )
 
   target_compile_options(${_project} PRIVATE
-    $<$<COMPILE_LANGUAGE:C>:-mcpu=cortex-m3>
-    -mthumb -fno-builtin -Wall -ffunction-sections
-    -fdata-sections -fomit-frame-pointer -mabi=aapcs
-    $<$<COMPILE_LANGUAGE:ASM>:-x assembler-with-cpp>
-    $<$<CONFIG:Debug>:-Og -g>
-    $<$<CONFIG:Release>:-Os>
+    $<$<COMPILE_LANGUAGE:C>:-xc>
+    $<$<COMPILE_LANGUAGE:ASM>:-x assembler-with-cpp> -mthumb -mcpu=${MCPU}
+    $<$<CONFIG:Debug>:-Og> -Wall -ffunction-sections -fdata-sections -MMD
   )
 
   target_link_options(${_project} PRIVATE
-    -Wl,--gc-sections --specs=nano.specs --specs=nosys.specs
-    -Wl,-Map=${PROJECT_NAME}.map -T${LINKER_SCRIPT}
-    $<$<CONFIG:Release>:-flto>
+    -mthumb -mcpu=${MCPU} -T${LINKER_SCRIPT}
+    --specs=nosys.specs --specs=nano.specs -Wl,--gc-sections
+    -Wl,--print-memory-usage
+    -Wl,-Map=${PROJECT_NAME}.map
   )
 
   target_link_libraries(${_project} PRIVATE
-    c
     m
-    nosys
   )
 
   set_target_properties(${_project} PROPERTIES
-    C_STANDARD 99
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
+    C_STANDARD 11
     C_STANDARD_REQUIRED ON
-    C_EXTENSIONS ON
+    C_EXTENSIONS OFF
   )
 
   add_custom_command(TARGET ${_project} POST_BUILD

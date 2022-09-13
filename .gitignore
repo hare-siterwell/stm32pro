@@ -2,9 +2,4 @@
 *.user*
 .vscode/
 build/
-
-# STM32
-Drivers/
-.mxproject
-bin/*.bin
-bin/*.hex
+bin/
