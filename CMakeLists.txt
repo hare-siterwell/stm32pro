@@ -15,8 +15,7 @@ file(GLOB PROJECT_SOURCES CONFIGURE_DEPENDS
   src/user/*.c
   src/system/*.c
   src/hardware/*.c
-  lib/STM32F1xx_HAL_Driver/Src/*.c
-)
+  lib/STM32F1xx_HAL_Driver/Src/*.c)
 
 set(PROJECT_LIST ${PROJECT_NAME}.elf)
 
@@ -31,41 +30,32 @@ foreach(_project ${PROJECT_LIST})
     src/hardware
     lib/CMSIS/Include
     lib/CMSIS/Device/ST/STM32F1xx/Include
-    lib/STM32F1xx_HAL_Driver/Inc
-  )
+    lib/STM32F1xx_HAL_Driver/Inc)
 
   target_compile_definitions(${_project} PRIVATE
     -DSTM32F103xB
     -DUSE_FULL_LL_DRIVER
-    -DHSE_VALUE=12000000U
-  )
+    -DHSE_VALUE=12000000U)
 
   target_compile_options(${_project} PRIVATE
     $<$<COMPILE_LANGUAGE:C>:-xc>
     $<$<COMPILE_LANGUAGE:ASM>:-x assembler-with-cpp> -mthumb -mcpu=${MCPU}
-    $<$<CONFIG:Debug>:-Og> -Wall -ffunction-sections -fdata-sections -MMD
-  )
+    $<$<CONFIG:Debug>:-Og> -Wall -ffunction-sections -fdata-sections -MMD)
 
   target_link_options(${_project} PRIVATE
-    -mthumb -mcpu=${MCPU} -T${LINKER_SCRIPT}
-    --specs=nosys.specs --specs=nano.specs -Wl,--gc-sections
-    -Wl,--print-memory-usage
-    -Wl,-Map=${PROJECT_NAME}.map
-  )
+    -mthumb -mcpu=${MCPU} -T${LINKER_SCRIPT} --specs=nosys.specs
+    --specs=nano.specs -Wl,--gc-sections -Wl,--print-memory-usage
+    -Wl,-Map=${PROJECT_NAME}.map)
 
-  target_link_libraries(${_project} PRIVATE
-    m
-  )
+  target_link_libraries(${_project} PRIVATE m)
 
   set_target_properties(${_project} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
     C_STANDARD 11
     C_STANDARD_REQUIRED ON
-    C_EXTENSIONS OFF
-  )
+    C_EXTENSIONS OFF)
 
   add_custom_command(TARGET ${_project} POST_BUILD
     COMMAND ${CMAKE_OBJCOPY} -Oihex $<TARGET_FILE:${_project}>
-    ${PROJECT_SOURCE_DIR}/bin/${PROJECT_NAME}.hex
-  )
+    ${PROJECT_SOURCE_DIR}/bin/${PROJECT_NAME}.hex)
 endforeach()
