@@ -7,35 +7,37 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 project(stm32pro C ASM)
 
-set(LINKER_SCRIPT "${PROJECT_SOURCE_DIR}/src/STM32F103C8Tx_FLASH.ld")
-set(MCPU "cortex-m3")
+set(LINKER_SCRIPT ${PROJECT_SOURCE_DIR}/src/STM32F103C8Tx_FLASH.ld)
+set(MCPU cortex-m3)
 
-file(GLOB PROJECT_SOURCES CONFIGURE_DEPENDS
-  src/startup_*.s
-  src/user/*.c
-  src/system/*.c
-  src/hardware/*.c
-  lib/STM32F1xx_HAL_Driver/Src/*.c)
+# 递归包含源文件
+file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
+  src/*
+  third_party/STM32F1xx_HAL_Driver/Src/*)
+
+# 从源文件中排除
+list(REMOVE_ITEM PROJECT_SOURCES)
 
 set(PROJECT_LIST ${PROJECT_NAME}.elf)
-
 foreach(_project ${PROJECT_LIST})
   add_executable(${_project})
-
   target_sources(${_project} PRIVATE ${PROJECT_SOURCES})
 
+  # 头文件路径
   target_include_directories(${_project} PRIVATE
     src/user
     src/system
     src/hardware
-    lib/CMSIS/Include
-    lib/CMSIS/Device/ST/STM32F1xx/Include
-    lib/STM32F1xx_HAL_Driver/Inc)
+    third_party/CMSIS/Include
+    third_party/CMSIS/Device/ST/STM32F1xx/Include
+    third_party/STM32F1xx_HAL_Driver/Inc
+    third_party/freertos/repo/include)
 
+  # 预定义
   target_compile_definitions(${_project} PRIVATE
-    -DSTM32F103xB
-    -DUSE_FULL_LL_DRIVER
-    -DHSE_VALUE=12000000U)
+    STM32F103xB
+    USE_FULL_LL_DRIVER
+    HSE_VALUE=12000000U)
 
   target_compile_options(${_project} PRIVATE
     $<$<COMPILE_LANGUAGE:C>:-xc>
