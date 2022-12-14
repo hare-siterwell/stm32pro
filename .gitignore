@@ -6,6 +6,9 @@ bin/
 # Temporary Directories
 .tmp/
 
+# Platforms
+.DS_Store
+
 # VS Code Configs
 .vscode/*
 

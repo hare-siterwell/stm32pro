@@ -7,13 +7,13 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 project(stm32pro C ASM)
 
-set(LINKER_SCRIPT ${PROJECT_SOURCE_DIR}/src/STM32F103C8Tx_FLASH.ld)
+set(LINKER_SCRIPT ${PROJECT_SOURCE_DIR}/gcc/STM32F103C8Tx_FLASH.ld)
 set(MCPU cortex-m3)
 
 # 递归包含源文件
 file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
-  src/*
-  third_party/STM32F1xx_HAL_Driver/Src/*)
+  gcc/startup_stm32f103xb.s
+  src/*)
 
 # 从源文件中排除
 list(REMOVE_ITEM PROJECT_SOURCES)
@@ -27,10 +27,12 @@ foreach(_project ${PROJECT_LIST})
   target_include_directories(${_project} PRIVATE
     src/user
     src/system
+    src/public
     src/hardware
-    third_party/CMSIS/Include
-    third_party/CMSIS/Device/ST/STM32F1xx/Include
-    third_party/STM32F1xx_HAL_Driver/Inc
+    src/hardware/CMSIS/Include
+    src/hardware/CMSIS/Device/ST/STM32F1xx/Include
+    src/hardware/STM32F1xx_HAL_Driver/Inc
+    src/function
     third_party/freertos/repo/include)
 
   # 预定义
